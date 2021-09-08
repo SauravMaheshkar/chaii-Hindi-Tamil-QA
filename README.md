@@ -2,10 +2,10 @@ My Model files and code for '**chaii - Hindi and Tamil Question Answering**' Kag
 
 <details>
   <summary>Initial Baseline Experiments</summary>
-  
-<br> 
-  
-[Link to Weights and Biases 🔥 Interactive Dashboard](https://wandb.ai/sauravmaheshkar/chaii/reports/Baseline-Models-LB--Vmlldzo5NzYzMTE). 
+
+<br>
+
+[Link to Weights and Biases 🔥 Interactive Dashboard](https://wandb.ai/sauravmaheshkar/chaii/reports/Baseline-Models-LB--Vmlldzo5NzYzMTE).
 
 <br>
 
