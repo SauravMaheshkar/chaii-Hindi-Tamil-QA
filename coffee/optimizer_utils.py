@@ -9,11 +9,12 @@ def get_optimizer_params(model, type="s"):
     if type == "s":
         optimizer_parameters = filter(lambda x: x.requires_grad, model.parameters())
     elif type == "i":
+
         optimizer_parameters = [
             {
                 "params": [
                     p
-                    for n, p in model.roberta.named_parameters()
+                    for n, p in model.transformer.named_parameters()
                     if not any(nd in n for nd in no_decay)
                 ],
                 "weight_decay_rate": 0.01,
@@ -21,14 +22,14 @@ def get_optimizer_params(model, type="s"):
             {
                 "params": [
                     p
-                    for n, p in model.roberta.named_parameters()
+                    for n, p in model.transformer.named_parameters()
                     if any(nd in n for nd in no_decay)
                 ],
                 "weight_decay_rate": 0.0,
             },
             {
                 "params": [
-                    p for n, p in model.named_parameters() if "roberta" not in n
+                    p for n, p in model.named_parameters() if "transformer" not in n
                 ],
                 "lr": 1e-3,
                 "weight_decay_rate": 0.01,
@@ -56,7 +57,7 @@ def get_optimizer_params(model, type="s"):
             {
                 "params": [
                     p
-                    for n, p in model.roberta.named_parameters()
+                    for n, p in model.transformer.named_parameters()
                     if not any(nd in n for nd in no_decay)
                     and not any(nd in n for nd in group_all)
                 ],
@@ -65,7 +66,7 @@ def get_optimizer_params(model, type="s"):
             {
                 "params": [
                     p
-                    for n, p in model.roberta.named_parameters()
+                    for n, p in model.transformer.named_parameters()
                     if not any(nd in n for nd in no_decay)
                     and any(nd in n for nd in group1)
                 ],
@@ -75,7 +76,7 @@ def get_optimizer_params(model, type="s"):
             {
                 "params": [
                     p
-                    for n, p in model.roberta.named_parameters()
+                    for n, p in model.transformer.named_parameters()
                     if not any(nd in n for nd in no_decay)
                     and any(nd in n for nd in group2)
                 ],
@@ -85,7 +86,7 @@ def get_optimizer_params(model, type="s"):
             {
                 "params": [
                     p
-                    for n, p in model.roberta.named_parameters()
+                    for n, p in model.transformer.named_parameters()
                     if not any(nd in n for nd in no_decay)
                     and any(nd in n for nd in group3)
                 ],
@@ -95,7 +96,7 @@ def get_optimizer_params(model, type="s"):
             {
                 "params": [
                     p
-                    for n, p in model.roberta.named_parameters()
+                    for n, p in model.transformer.named_parameters()
                     if any(nd in n for nd in no_decay)
                     and not any(nd in n for nd in group_all)
                 ],
@@ -104,7 +105,7 @@ def get_optimizer_params(model, type="s"):
             {
                 "params": [
                     p
-                    for n, p in model.roberta.named_parameters()
+                    for n, p in model.transformer.named_parameters()
                     if any(nd in n for nd in no_decay) and any(nd in n for nd in group1)
                 ],
                 "weight_decay_rate": 0.0,
@@ -113,7 +114,7 @@ def get_optimizer_params(model, type="s"):
             {
                 "params": [
                     p
-                    for n, p in model.roberta.named_parameters()
+                    for n, p in model.transformer.named_parameters()
                     if any(nd in n for nd in no_decay) and any(nd in n for nd in group2)
                 ],
                 "weight_decay_rate": 0.0,
@@ -122,7 +123,7 @@ def get_optimizer_params(model, type="s"):
             {
                 "params": [
                     p
-                    for n, p in model.roberta.named_parameters()
+                    for n, p in model.transformer.named_parameters()
                     if any(nd in n for nd in no_decay) and any(nd in n for nd in group3)
                 ],
                 "weight_decay_rate": 0.0,
@@ -130,10 +131,10 @@ def get_optimizer_params(model, type="s"):
             },
             {
                 "params": [
-                    p for n, p in model.named_parameters() if "roberta" not in n
+                    p for n, p in model.named_parameters() if "transformer" not in n
                 ],
                 "lr": 1e-3,
-                "momentum": 0.99,
+                # "momentum": 0.99,
             },
         ]
     return optimizer_parameters
