@@ -13,6 +13,7 @@ from transformers import (  # type: ignore
 from .data_utils import prepare_train_features
 from .dataloader import Dataset
 from .nn import Model
+from .optimizer_utils import get_optimizer_params
 from .utils import optimal_num_of_loader_workers
 
 __all__ = ["make_model", "make_optimizer", "make_scheduler", "make_loader"]
@@ -25,32 +26,14 @@ def make_model(args) -> Sequence:
     return config, tokenizer, model
 
 
-def make_optimizer(args, model) -> Optimizer:
-    no_decay = ["bias", "LayerNorm.weight"]
-    optimizer_grouped_parameters = [
-        {
-            "params": [
-                p
-                for n, p in model.named_parameters()
-                if not any(nd in n for nd in no_decay)
-            ],
-            "weight_decay": args.weight_decay,
-        },
-        {
-            "params": [
-                p
-                for n, p in model.named_parameters()
-                if any(nd in n for nd in no_decay)
-            ],
-            "weight_decay": 0.0,
-        },
-    ]
+def make_optimizer(args, model, strategy: str = "s") -> Optimizer:
+
+    assert strategy in ["s", "i", "a"], "Choose either s, i or a"
+
+    parameters = get_optimizer_params(model, strategy)
 
     optimizer = AdamW(
-        optimizer_grouped_parameters,
-        lr=args.learning_rate,
-        eps=args.epsilon,
-        correct_bias=True,
+        parameters, lr=args.learning_rate, eps=args.epsilon, correct_bias=True
     )
 
     return optimizer
