@@ -1,6 +1,7 @@
 import json
 
 import torch
+import wandb
 
 from .utils import AverageMeter, loss_fn, set_seed
 
@@ -75,6 +76,8 @@ class Trainer:
                 ]
                 print(", ".join(ret))
 
+        wandb.log({"Training Loss": losses.avg})
+
         result_dict["train_loss"].append(losses.avg)
         return result_dict
 
@@ -117,5 +120,6 @@ class Evaluator:
 
         print("----Validation Results Summary----")
         print("Epoch: [{}] Valid Loss: {: >4.5f}".format(epoch, losses.avg))
+        wandb.log({"Validation Loss": losses.avg})
         result_dict["val_loss"].append(losses.avg)
         return result_dict
