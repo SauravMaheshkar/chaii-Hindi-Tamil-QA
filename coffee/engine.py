@@ -15,14 +15,14 @@ class Trainer:
         self.optimizer = optimizer
         self.scheduler = scheduler
 
-    def train(self, args, train_dataloader, epoch, result_dict):
+    def train(self, config: dict, train_dataloader, epoch, result_dict):
         count = 0
         losses = AverageMeter()
 
         self.model.zero_grad()
         self.model.train()
 
-        set_seed(args.seed)
+        set_seed(config["seed"])
 
         for batch_idx, batch_data in enumerate(train_dataloader):
             input_ids, attention_mask, targets_start, targets_end = (
@@ -44,7 +44,7 @@ class Trainer:
             )
 
             loss = loss_fn((outputs_start, outputs_end), (targets_start, targets_end))
-            loss = loss / args.gradient_accumulation_steps
+            loss = loss / config["gradient_accumulation_steps"]
 
             loss.backward()
 
@@ -52,17 +52,19 @@ class Trainer:
             wandb.log({"Training Loss": loss.item()})
             losses.update(loss.item(), input_ids.size(0))
 
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), args.max_grad_norm)
+            torch.nn.utils.clip_grad_norm_(
+                self.model.parameters(), config["max_grad_norm"]
+            )
 
             if (
-                batch_idx % args.gradient_accumulation_steps == 0
+                batch_idx % config["gradient_accumulation_steps"] == 0
                 or batch_idx == len(train_dataloader) - 1
             ):
                 self.optimizer.step()
                 self.scheduler.step()
                 self.optimizer.zero_grad()
 
-            if (batch_idx % args.logging_steps == 0) or (batch_idx + 1) == len(
+            if (batch_idx % config["logging_steps"] == 0) or (batch_idx + 1) == len(
                 train_dataloader
             ):
                 _s = str(len(str(len(train_dataloader.sampler))))
