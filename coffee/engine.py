@@ -49,6 +49,7 @@ class Trainer:
             loss.backward()
 
             count += input_ids.size(0)
+            wandb.log({"Training Loss": loss.item()})
             losses.update(loss.item(), input_ids.size(0))
 
             torch.nn.utils.clip_grad_norm_(
@@ -77,8 +78,6 @@ class Trainer:
                     "Train Loss: {: >4.5f}".format(losses.avg),
                 ]
                 print(", ".join(ret))
-
-        wandb.log({"Training Loss": losses.avg})
 
         result_dict["train_loss"].append(losses.avg)
         return result_dict
@@ -118,10 +117,10 @@ class Evaluator:
                 loss = loss_fn(
                     (outputs_start, outputs_end), (targets_start, targets_end)
                 )
+                wandb.log({"Validation Loss": loss.item()})
                 losses.update(loss.item(), input_ids.size(0))
 
         print("----Validation Results Summary----")
         print("Epoch: [{}] Valid Loss: {: >4.5f}".format(epoch, losses.avg))
-        wandb.log({"Validation Loss": losses.avg})
         result_dict["val_loss"].append(losses.avg)
         return result_dict
