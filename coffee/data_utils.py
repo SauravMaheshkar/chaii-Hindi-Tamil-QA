@@ -1,14 +1,14 @@
 __all__ = ["prepare_train_features"]
 
 
-def prepare_train_features(args, example, tokenizer):
+def prepare_train_features(config: dict, example, tokenizer):
     example["question"] = example["question"].lstrip()
     tokenized_example = tokenizer(
         example["question"],
         example["context"],
         truncation="only_second",
-        max_length=args.max_seq_length,
-        stride=args.doc_stride,
+        max_length=config["max_seq_length"],
+        stride=config["doc_stride"],
         return_overflowing_tokens=True,
         return_offsets_mapping=True,
         padding="max_length",

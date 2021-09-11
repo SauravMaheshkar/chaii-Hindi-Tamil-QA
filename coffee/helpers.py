@@ -19,14 +19,14 @@ from .utils import optimal_num_of_loader_workers
 __all__ = ["make_model", "make_optimizer", "make_scheduler", "make_loader"]
 
 
-def make_model(args) -> Sequence:
-    config = AutoConfig.from_pretrained(args.config_name)
-    tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_name)
-    model = Model(args.model_name_or_path, config=config)
+def make_model(config: dict) -> Sequence:
+    cfg = AutoConfig.from_pretrained(config["config_name"])
+    tokenizer = AutoTokenizer.from_pretrained(config["tokenizer_name"])
+    model = Model(config["model_name_or_path"], config=cfg)
     return config, tokenizer, model
 
 
-def make_optimizer(args, model, strategy: str = "s") -> Optimizer:
+def make_optimizer(config: dict, model, strategy: str = "s") -> Optimizer:
 
     assert strategy in ["s", "i", "a"], "Choose either s, i or a"
 
@@ -39,7 +39,7 @@ def make_optimizer(args, model, strategy: str = "s") -> Optimizer:
                 for n, p in model.named_parameters()
                 if not any(nd in n for nd in no_decay)
             ],
-            "weight_decay": args.weight_decay,
+            "weight_decay": config["weight_decay"],
         },
         {
             "params": [
@@ -53,16 +53,16 @@ def make_optimizer(args, model, strategy: str = "s") -> Optimizer:
 
     optimizer = AdamW(
         optimizer_grouped_parameters,
-        lr=args.learning_rate,
-        eps=args.epsilon,
+        lr=config["learning_rate"],
+        eps=config["epsilon"],
         correct_bias=True,
     )
 
     return optimizer
 
 
-def make_scheduler(args, optimizer, num_warmup_steps, num_training_steps):
-    if args.decay_name == "cosine-warmup":
+def make_scheduler(config: dict, optimizer, num_warmup_steps, num_training_steps):
+    if config["decay_name"] == "cosine-warmup":
         scheduler = get_cosine_schedule_with_warmup(
             optimizer,
             num_warmup_steps=num_warmup_steps,
@@ -77,14 +77,14 @@ def make_scheduler(args, optimizer, num_warmup_steps, num_training_steps):
     return scheduler
 
 
-def make_loader(args, data, tokenizer, fold) -> Sequence[DataLoader]:
+def make_loader(config: dict, data, tokenizer, fold) -> Sequence[DataLoader]:
     train_set, valid_set = data[data["kfold"] != fold], data[data["kfold"] == fold]
 
     train_features, valid_features = [[] for _ in range(2)]
     for i, row in train_set.iterrows():
-        train_features += prepare_train_features(args, row, tokenizer)
+        train_features += prepare_train_features(config, row, tokenizer)
     for i, row in valid_set.iterrows():
-        valid_features += prepare_train_features(args, row, tokenizer)
+        valid_features += prepare_train_features(config, row, tokenizer)
 
     train_dataset = Dataset(train_features)
     valid_dataset = Dataset(valid_features)
@@ -97,7 +97,7 @@ def make_loader(args, data, tokenizer, fold) -> Sequence[DataLoader]:
 
     train_dataloader = DataLoader(
         train_dataset,
-        batch_size=args.train_batch_size,
+        batch_size=config["train_batch_size"],
         sampler=train_sampler,
         num_workers=optimal_num_of_loader_workers(),
         pin_memory=True,
@@ -106,7 +106,7 @@ def make_loader(args, data, tokenizer, fold) -> Sequence[DataLoader]:
 
     valid_dataloader = DataLoader(
         valid_dataset,
-        batch_size=args.eval_batch_size,
+        batch_size=config["eval_batch_size"],
         sampler=valid_sampler,
         num_workers=optimal_num_of_loader_workers(),
         pin_memory=True,
