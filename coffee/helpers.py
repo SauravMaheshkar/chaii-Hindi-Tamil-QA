@@ -22,7 +22,11 @@ __all__ = ["make_model", "make_optimizer", "make_scheduler", "make_loader"]
 def make_model(config: dict) -> Sequence:
     cfg = AutoConfig.from_pretrained(config["config_name"])
     tokenizer = AutoTokenizer.from_pretrained(config["tokenizer_name"])
-    model = Model(config["model_name_or_path"], config=cfg)
+    model = Model(
+        config["model_name_or_path"],
+        config=cfg,
+        output_head_dropout_prob=config["output_head_dropout_prob"],
+    )
     return config, tokenizer, model
 
 
