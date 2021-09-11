@@ -27,7 +27,7 @@ def make_model(config: dict) -> Sequence:
         config=cfg,
         output_head_dropout_prob=config["output_head_dropout_prob"],
     )
-    return config, tokenizer, model
+    return cfg, tokenizer, model
 
 
 def make_optimizer(config: dict, model, strategy: str = "s") -> Optimizer:
