@@ -1,4 +1,4 @@
-__all__ = ["prepare_train_features"]
+__all__ = ["prepare_train_features", "prepare_test_features"]
 
 
 def prepare_train_features(config: dict, example, tokenizer):
@@ -66,5 +66,35 @@ def prepare_train_features(config: dict, example, tokenizer):
                     token_end_index -= 1
                 feature["end_position"] = token_end_index + 1
 
+        features.append(feature)
+    return features
+
+
+def prepare_test_features(config: dict, example, tokenizer):
+    example["question"] = example["question"].lstrip()
+
+    tokenized_example = tokenizer(
+        example["question"],
+        example["context"],
+        truncation="only_second",
+        max_length=config["max_seq_length"],
+        stride=config["doc_stride"],
+        return_overflowing_tokens=True,
+        return_offsets_mapping=True,
+        padding="max_length",
+    )
+
+    features = []
+    for i in range(len(tokenized_example["input_ids"])):
+        feature = {}
+        feature["example_id"] = example["id"]
+        feature["context"] = example["context"]
+        feature["question"] = example["question"]
+        feature["input_ids"] = tokenized_example["input_ids"][i]
+        feature["attention_mask"] = tokenized_example["attention_mask"][i]
+        feature["offset_mapping"] = tokenized_example["offset_mapping"][i]
+        feature["sequence_ids"] = [
+            0 if i is None else i for i in tokenized_example.sequence_ids(i)
+        ]
         features.append(feature)
     return features
