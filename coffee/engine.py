@@ -50,10 +50,10 @@ class Trainer:
             )
 
             input_ids, attention_mask, targets_start, targets_end = (
-                input_ids.cuda(),
-                attention_mask.cuda(),
-                targets_start.cuda(),
-                targets_end.cuda(),
+                input_ids,
+                attention_mask,
+                targets_start,
+                targets_end,
             )
 
             outputs_start, outputs_end = self.model(
@@ -122,10 +122,10 @@ class Evaluator:
             )
 
             input_ids, attention_mask, targets_start, targets_end = (
-                input_ids.cuda(),
-                attention_mask.cuda(),
-                targets_start.cuda(),
-                targets_end.cuda(),
+                input_ids,
+                attention_mask,
+                targets_start,
+                targets_end,
             )
 
             with torch.no_grad():
