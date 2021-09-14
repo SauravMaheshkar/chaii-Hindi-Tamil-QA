@@ -4,8 +4,8 @@ __all__ = ["Dataset"]
 
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, features, mode: str = "train"):
-        super(Dataset, self).__init__()
+    def __init__(self, features, mode: str = "train", *args, **kwargs):
+        super(Dataset, self).__init__(*args, **kwargs)
         self.features = features
         self.mode = mode
 

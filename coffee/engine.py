@@ -1,6 +1,7 @@
 import json
 
 import torch
+import transformers
 import wandb
 
 from .utils import AverageMeter, loss_fn, set_seed
@@ -15,14 +16,30 @@ class Trainer:
         self.optimizer = optimizer
         self.scheduler = scheduler
 
-    def train(self, config: dict, train_dataloader, epoch, result_dict):
+    def train(
+        self, config: dict, accelerate_object, train_dataloader, epoch, result_dict
+    ):
         count = 0
+
+        # Initialize Accelerator and a AverageMeter
         losses = AverageMeter()
+
+        # -------- Output Prettification ✨ -------- #
+        if accelerate_object.is_main_process:
+            transformers.utils.logging.set_verbosity_info()
+        else:
+            transformers.utils.logging.set_verbosity_error()
 
         self.model.zero_grad()
         self.model.train()
 
+        # Set Random Seed
         set_seed(config["seed"])
+
+        # Prepare everything
+        self.model, self.optimizer, train_dataloader = accelerate_object.prepare(
+            self.model, self.optimizer, train_dataloader
+        )
 
         for batch_idx, batch_data in enumerate(train_dataloader):
             input_ids, attention_mask, targets_start, targets_end = (
@@ -46,13 +63,13 @@ class Trainer:
             loss = loss_fn((outputs_start, outputs_end), (targets_start, targets_end))
             loss = loss / config["gradient_accumulation_steps"]
 
-            loss.backward()
+            accelerate_object.backward(loss)
 
             count += input_ids.size(0)
             wandb.log({"Training Loss": loss.item()})
             losses.update(loss.item(), input_ids.size(0))
 
-            torch.nn.utils.clip_grad_norm_(
+            accelerate_object.clip_grad_norm_(
                 self.model.parameters(), config["max_grad_norm"]
             )
 
@@ -77,7 +94,7 @@ class Trainer:
                     ),
                     "Train Loss: {: >4.5f}".format(losses.avg),
                 ]
-                print(", ".join(ret))
+                accelerate_object.print(", ".join(ret))
 
         result_dict["train_loss"].append(losses.avg)
         return result_dict
@@ -92,8 +109,10 @@ class Evaluator:
             f.write(json.dumps(result, sort_keys=True, indent=4, ensure_ascii=False))
 
     def evaluate(self, valid_dataloader, epoch, result_dict):
+
         losses = AverageMeter()
         for batch_idx, batch_data in enumerate(valid_dataloader):
+            # Prepare everything
             self.model = self.model.eval()
             input_ids, attention_mask, targets_start, targets_end = (
                 batch_data["input_ids"],
@@ -122,5 +141,6 @@ class Evaluator:
 
         print("----Validation Results Summary----")
         print("Epoch: [{}] Valid Loss: {: >4.5f}".format(epoch, losses.avg))
+
         result_dict["val_loss"].append(losses.avg)
         return result_dict
