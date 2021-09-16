@@ -1,7 +1,6 @@
 import json
 
 import torch
-import transformers
 import wandb
 
 from .utils import AverageMeter, loss_fn, set_seed
@@ -23,12 +22,6 @@ class Trainer:
 
         # Initialize Accelerator and a AverageMeter
         losses = AverageMeter()
-
-        # -------- Output Prettification ✨ -------- #
-        if accelerate_object.is_main_process:
-            transformers.utils.logging.set_verbosity_info()
-        else:
-            transformers.utils.logging.set_verbosity_error()
 
         self.model.zero_grad()
         self.model.train()

@@ -9,14 +9,9 @@ __all__ = ["Model"]
 
 class Model(nn.Module):
     def __init__(
-        self,
-        modelname_or_path: str,
-        config: Any,
-        output_head_dropout_prob: float = 0.1,
-        *args,
-        **kwargs
+        self, modelname_or_path: str, config: Any, output_head_dropout_prob: float = 0.1
     ):
-        super(Model, self).__init__(*args, **kwargs)
+        super(Model, self).__init__()
         self.config = config
 
         self.arch = AutoModel.from_pretrained(modelname_or_path, config=config)
