@@ -24,3 +24,12 @@ repos:
         additional_dependencies:
           - flake8-black>=0.1.1
         language_version: python3
+-   repo: local
+    hooks:
+      - id: pytest-check
+        name: pytest-check
+        entry: pytest
+        language: python
+        additional_dependencies: [pre-commit, pytest, torch, transformers, scikit-learn, numpy, pandas]
+        pass_filenames: false
+        always_run: true
