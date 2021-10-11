@@ -6,7 +6,9 @@ from transformers import (  # type: ignore
     AdamW,
     AutoConfig,
     AutoTokenizer,
+    get_constant_schedule_with_warmup,
     get_cosine_schedule_with_warmup,
+    get_cosine_with_hard_restarts_schedule_with_warmup,
     get_linear_schedule_with_warmup,
 )
 
@@ -71,6 +73,17 @@ def make_scheduler(config: dict, optimizer, num_warmup_steps, num_training_steps
             optimizer,
             num_warmup_steps=num_warmup_steps,
             num_training_steps=num_training_steps,
+        )
+    elif config["decay_name"] == "constant-warmup":
+        scheduler = get_constant_schedule_with_warmup(
+            optimizer, num_warmup_steps=num_warmup_steps
+        )
+    elif config["decay_name"] == "cosine-hardreset-warmup":
+        scheduler = get_cosine_with_hard_restarts_schedule_with_warmup(
+            optimizer,
+            num_warmup_steps=num_warmup_steps,
+            num_training_steps=num_training_steps,
+            num_cycles=config["num_cycles"],
         )
     else:
         scheduler = get_linear_schedule_with_warmup(
