@@ -1,3 +1,7 @@
+<div align = "center">
+  <img src = "https://github.com/SauravMaheshkar/chaii-Hindi-Tamil-QA/blob/main/assets/Coffee%20Banner.png?raw=true">
+</div>
+
 My Model files and code for '**chaii - Hindi and Tamil Question Answering**' Kaggle competition organized by Google
 
 <details>
