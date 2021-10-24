@@ -2,6 +2,8 @@
   <img src = "https://github.com/SauravMaheshkar/chaii-Hindi-Tamil-QA/blob/main/assets/Coffee%20Banner.png?raw=true">
 </div>
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/SauravMaheshkar/chaii-Hindi-Tamil-QA/HEAD) ![](https://anaconda.org/sauravmaheshkar/chaii/badges/license.svg) [![Build and Tests](https://github.com/SauravMaheshkar/chaii-Hindi-Tamil-QA/actions/workflows/lint.yml/badge.svg)](https://github.com/SauravMaheshkar/chaii-Hindi-Tamil-QA/actions/workflows/lint.yml)
+
 My Model files and code for '**chaii - Hindi and Tamil Question Answering**' Kaggle competition organized by Google
 
 <details>
